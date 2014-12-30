@@ -1,4 +1,4 @@
-function showSummaryChartPart(by, data, reportType, isPDF) {
+function showSummaryChartPart(by, data, reportType) {
 	console.log(data)
 	var $e = $("#bodyPage");
 	var $container = $e.find(".sectionOverviewSummary-chart .chart-content");
@@ -7,7 +7,6 @@ function showSummaryChartPart(by, data, reportType, isPDF) {
 		$container.append("<div class='noData'>No Data!</div>");
 	} else {
 		by = by || "day";
-		isPDF = ("true" == isPDF);
 
 		// clear container
 		$container.empty();
@@ -137,7 +136,6 @@ function showSummaryChartPart(by, data, reportType, isPDF) {
 					}
 				},
 				series : {
-					lineWidth : isPDF ? -18 : 2,
 					shadow : false,
 					animation : false,
 				}
@@ -259,12 +257,13 @@ function showSummaryChartPart(by, data, reportType, isPDF) {
 	}
 }
 
-function showBottomSummaryPart(by, data, reportType) {
+function showBottomSummaryPart(by, data, reportType,conversionCurrency, conversionEnabled) {
 	var view = this;
 	var $e = $("#bodyPage");
 	var $summary = $e.find(".sectionOverviewSummary-summary");
 	var $table = $summary.find("table");
 	var $funnel = $e.find(".sectionOverviewSummary-funnel");
+	conversionEnabled = (conversionEnabled == "true") ? true : false;
 
 	if (typeof data == "undefined") {
 		$funnel.html("");
@@ -276,7 +275,7 @@ function showBottomSummaryPart(by, data, reportType) {
 		by = by || "day";
 
 		// show table
-		var tableData = getTableData(data, reportType);
+		var tableData = getTableData(data, reportType, conversionEnabled);
 		var barBreak = false;
 		var rateBreak = false;
 		var barValues = [];
@@ -310,7 +309,7 @@ function showBottomSummaryPart(by, data, reportType) {
 			var $tr = smr.render("tmpl-sectionOverviewSummary-summary-tr", {
 				summaryObj : summaryObj,
 				reportType : reportType,
-				conversionCurrency : smr.conversionCurrency,
+				conversionCurrency : conversionCurrency,
 				showName : showName
 			});
 			$table.append($tr);
@@ -399,10 +398,10 @@ function drawBar($table, metric) {
 	gtx.stroke();
 	gtx.fill();
 }
-function getTableData(data, reportType) {
+function getTableData(data, reportType, conversionEnabled) {
 	var batchTableNames = [];
 	// only when conversionEnabled=true,should show Conversions and Revenue
-	if (smr.conversionEnabled) {
+	if (conversionEnabled) {
 		batchTableNames = [ {
 			label : 'Sent',
 			name : 'sent',
@@ -489,7 +488,7 @@ function getTableData(data, reportType) {
 	}
 	// only when conversionEnabled=true,should show Conversions and Revenue
 	var transactionalTableNames = [];
-	if (smr.conversionEnabled) {
+	if (conversionEnabled) {
 		transactionalTableNames = [ {
 			label : 'Sent',
 			name : 'sent',
@@ -571,7 +570,7 @@ function getTableData(data, reportType) {
 
 	// only when conversionEnabled=true,should show Conversions and Revenue
 	var programTableNames = [];
-	if (smr.conversionEnabled) {
+	if (conversionEnabled) {
 		programTableNames = [ {
 			label : 'Sent',
 			name : 'sent',
